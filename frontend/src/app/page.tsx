@@ -10,7 +10,9 @@ import {
   Sparkles,
   ShieldCheck,
   BarChart3,
-  Users,
+  Award,
+  CheckCircle2,
+  FolderKanban,
 } from "lucide-react";
 import { Button, Card, CardContent, Badge, Stepper } from "@/components/ui";
 
@@ -72,7 +74,7 @@ export default function HomePage() {
           <div className="space-y-6">
             <div className="hero-animate inline-flex items-center gap-2 rounded-full bg-white/10 border border-accent-400/40 px-3.5 py-1.5 text-xs font-medium text-accent-300">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>มหาวิทยาลัยราชภัฏจันทรเกษม • สีเทา–เหลือง</span>
+              <span>มหาวิทยาลัยราชภัฏจันทรเกษม</span>
             </div>
 
             <h1 className="hero-animate text-3xl sm:text-5xl font-bold leading-tight tracking-tight">
@@ -100,55 +102,58 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 3 Login Portals Card */}
+          {/* System Highlights & CRU Skill Framework Preview Card */}
           <div className="hero-animate">
             <Card className="bg-card border-primary-700/40 shadow-2xl text-foreground">
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-6 space-y-5">
                 <div className="border-b border-border pb-3">
-                  <Badge variant="accent" className="mb-1">ทางเข้าสู่ระบบ 3 บทบาท</Badge>
-                  <h3 className="font-bold text-lg">เลือกช่องทางเข้าใช้งานระบบ</h3>
-                  <p className="text-xs text-muted-foreground">รองรับบัญชีทดสอบสำหรับทั้ง 3 กลุ่มผู้ใช้งาน</p>
+                  <Badge variant="accent" className="mb-1">CRU Skill Framework</Badge>
+                  <h3 className="font-bold text-lg">ยกระดับผลงานนักศึกษาอย่างเป็นระบบ</h3>
+                  <p className="text-xs text-muted-foreground">เชื่อมโยงกิจกรรมระหว่างเรียน สู่แฟ้มสะสมผลงานและ Resume มาตรฐาน</p>
                 </div>
 
-                <div className="space-y-2.5">
-                  <Link href="/login" className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-accent-500 hover:bg-accent-50/50 transition-all">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-primary-800 text-accent-400 flex items-center justify-center">
-                        <GraduationCap className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">ทางเข้านักศึกษา</p>
-                        <p className="text-xs text-muted-foreground font-mono">student_test / password123</p>
-                      </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/40 border border-border">
+                    <div className="h-9 w-9 rounded-lg bg-primary-800 text-accent-400 flex items-center justify-center shrink-0">
+                      <FolderKanban className="h-4 w-4" />
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </Link>
+                    <div>
+                      <p className="font-semibold text-sm">คลังกิจกรรมและหลักฐานดิจิทัล</p>
+                      <p className="text-xs text-muted-foreground">บันทึกการเข้าร่วม แนบไฟล์ผลงาน และสรุปสิ่งที่ได้เรียนรู้</p>
+                    </div>
+                  </div>
 
-                  <Link href="/login" className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-accent-500 hover:bg-accent-50/50 transition-all">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-accent-400 text-primary-900 flex items-center justify-center">
-                        <Users className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">ทางเข้าอาจารย์ / ผู้จัดกิจกรรม</p>
-                        <p className="text-xs text-muted-foreground font-mono">lecturer_test / password123</p>
-                      </div>
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/40 border border-border">
+                    <div className="h-9 w-9 rounded-lg bg-accent-400 text-primary-900 flex items-center justify-center shrink-0">
+                      <Award className="h-4 w-4" />
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </Link>
+                    <div>
+                      <p className="font-semibold text-sm">ประเมินรับรองทักษะโดยอาจารย์</p>
+                      <p className="text-xs text-muted-foreground">แสดงผลคะแนนทักษะ 6 ด้านแบบ Radar Chart พร้อมหลักฐานอ้างอิง</p>
+                    </div>
+                  </div>
 
-                  <Link href="/login" className="flex items-center justify-between p-3.5 rounded-xl border border-border hover:border-accent-500 hover:bg-accent-50/50 transition-all">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-primary-100 text-primary-800 flex items-center justify-center">
-                        <ShieldCheck className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">ทางเข้าผู้ดูแลระบบ (Admin)</p>
-                        <p className="text-xs text-muted-foreground font-mono">admin_test / password123</p>
-                      </div>
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/40 border border-border">
+                    <div className="h-9 w-9 rounded-lg bg-primary-100 text-primary-800 flex items-center justify-center shrink-0">
+                      <FileText className="h-4 w-4" />
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </Link>
+                    <div>
+                      <p className="font-semibold text-sm">สร้าง Portfolio & ส่งออก Resume PDF</p>
+                      <p className="text-xs text-muted-foreground">จัดรูปแบบพร้อมยื่นสมัครงานและฝึกงานได้ทันทีในคลิกเดียว</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-1 border-t border-border">
+                  <p className="text-[11px] font-medium text-muted-foreground mb-2">ทักษะหลัก 6 ด้านที่ประเมินในระบบ</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["การสื่อสาร", "ทีมเวิร์ก", "วิเคราะห์", "ดิจิทัล", "ผู้นำ", "รับผิดชอบ"].map((sk) => (
+                      <Badge key={sk} variant="secondary" className="text-[11px]">
+                        <CheckCircle2 className="h-3 w-3 mr-1 text-primary-700" />
+                        {sk}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>

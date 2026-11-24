@@ -2,28 +2,62 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Share2, CheckCircle2, FileText, Eye, EyeOff, ExternalLink, Award, FolderKanban } from "lucide-react";
+import { Share2, CheckCircle2, FileText, Eye, EyeOff, ExternalLink, Award, FolderKanban, Plus } from "lucide-react";
 import {
   Breadcrumb, BackButton, Card, CardHeader, CardTitle, CardContent, Badge,
-  Button, Switch, Avatar, Rating, Tabs, Modal, EmptyState, useToast
+  Button, Switch, Avatar, Rating, Tabs, Modal, EmptyState, Input, Select, Textarea, FileUpload, FAB, useToast
 } from "@/components/ui";
 import { SkillRadarChart } from "@/components/portfolio/skill-radar-chart";
 import { useAuth } from "@/stores/auth-context";
-import { useAppStore } from "@/stores/app-store";
-import { PortfolioItem } from "@/types";
+import { useAppStore, CRU_SKILLS } from "@/stores/app-store";
+import { ActivityCategory, ACTIVITY_CATEGORIES, PortfolioItem } from "@/types";
 import { formatDate } from "@/lib/utils";
 
 export default function PortfolioPage() {
   const { user } = useAuth();
-  const { portfolioItems, assessments, radarData, togglePortfolioPublic } = useAppStore();
+  const { portfolioItems, assessments, radarData, addPortfolioItem, togglePortfolioPublic } = useAppStore();
   const { addToast } = useToast();
   const router = useRouter();
 
   const [selectedSkill, setSelectedSkill] = React.useState<string>("การสื่อสาร");
   const [activeTab, setActiveTab] = React.useState("works");
   const [previewItem, setPreviewItem] = React.useState<PortfolioItem | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+
+  const [title, setTitle] = React.useState("");
+  const [category, setCategory] = React.useState<ActivityCategory>("project");
+  const [skillId, setSkillId] = React.useState(CRU_SKILLS[0].id);
+  const [evidenceTitle, setEvidenceTitle] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [reflection, setReflection] = React.useState("");
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
 
   const myItems = portfolioItems.filter((p) => !user || p.studentId === user.id);
+
+  const handleCreatePortfolio = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      addToast("error", "กรุณาระบุชื่อผลงานหรือกิจกรรม");
+      return;
+    }
+    addPortfolioItem({
+      studentId: user?.id || "guest-student",
+      title: title.trim(),
+      category,
+      evidenceTitle: evidenceTitle.trim() || title.trim(),
+      description: description.trim() || "บันทึกผลงานเข้าสู่แฟ้มสะสมผลงาน",
+      reflection: reflection.trim(),
+      skillId,
+      fileName: selectedFile?.name,
+    });
+    addToast("success", "สร้างและเพิ่มผลงานเข้า Portfolio เรียบร้อยแล้ว");
+    setTitle("");
+    setEvidenceTitle("");
+    setDescription("");
+    setReflection("");
+    setSelectedFile(null);
+    setIsCreateOpen(false);
+  };
 
   const handleTogglePublic = (id: string) => {
     togglePortfolioPublic(id);
@@ -46,9 +80,14 @@ export default function PortfolioPage() {
           </div>
           <h1 className="text-2xl font-bold">แฟ้มสะสมผลงาน (Portfolio)</h1>
         </div>
-        <Button variant="accent" onClick={handleCopyShareLink}>
-          <Share2 className="h-4 w-4" /> คัดลอกลิงก์แชร์
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="accent" onClick={() => setIsCreateOpen(true)}>
+            <Plus className="h-4 w-4" /> สร้าง Portfolio
+          </Button>
+          <Button variant="outline" onClick={handleCopyShareLink}>
+            <Share2 className="h-4 w-4" /> คัดลอกลิงก์แชร์
+          </Button>
+        </div>
       </div>
 
       {/* Profile Header Card — CRU Gray-Yellow */}
@@ -107,8 +146,8 @@ export default function PortfolioPage() {
               <EmptyState
                 icon={<FolderKanban className="h-7 w-7" />}
                 title="ยังไม่มีหลักฐานที่รับรองแล้ว"
-                description="สมัครกิจกรรมและส่งหลักฐาน เพื่อให้อาจารย์ตรวจสอบและรับรองเข้าสู่ Portfolio"
-                action={{ label: "ดูกิจกรรมที่เปิดรับ", onClick: () => router.push("/activities") }}
+                description="สามารถกดสร้างผลงาน Portfolio โดยตรง หรือสมัครกิจกรรมเพื่อให้อาจารย์รับรอง"
+                action={{ label: "สร้าง Portfolio", onClick: () => setIsCreateOpen(true) }}
                 className="py-8"
               />
             ) : (
@@ -117,7 +156,9 @@ export default function PortfolioPage() {
                   <div key={item.id} className="rounded-xl border border-border p-4 space-y-2 bg-muted/20">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <Badge variant="success" className="mb-1">อาจารย์รับรองแล้ว</Badge>
+                        <Badge variant={item.assessments && item.assessments.length > 0 ? "success" : "secondary"} className="mb-1">
+                          {item.assessments && item.assessments.length > 0 ? "อาจารย์รับรองแล้ว" : "บันทึกโดยนักศึกษา"}
+                        </Badge>
                         <h4 className="font-semibold text-sm">{item.activity?.title}</h4>
                       </div>
                       <Rating value={item.assessments?.[0]?.level || 0} readonly size="sm" />
@@ -149,8 +190,8 @@ export default function PortfolioPage() {
             <EmptyState
               icon={<FileText className="h-8 w-8" />}
               title="ยังไม่มีผลงานใน Portfolio"
-              description="เริ่มต้นด้วยการสมัครเข้าร่วมกิจกรรมระหว่างเรียนและส่งหลักฐานผลงาน"
-              action={{ label: "ไปหน้ากิจกรรม", onClick: () => router.push("/activities") }}
+              description="กดปุ่มด้านล่างเพื่อสร้างและเพิ่มผลงานเข้าสู่แฟ้มสะสมผลงานของคุณได้ทันที"
+              action={{ label: "+ สร้างผลงาน Portfolio", onClick: () => setIsCreateOpen(true) }}
             />
           </Card>
         ) : activeTab === "works" ? (
@@ -244,6 +285,77 @@ export default function PortfolioPage() {
           </div>
         )}
       </Modal>
+      {/* Create Portfolio Modal / Sheet */}
+      <Modal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        title="สร้างผลงาน Portfolio ใหม่"
+        description="เพิ่มผลงาน โครงงาน หรือเกียรติบัตรเข้าสู่แฟ้มสะสมผลงานของคุณ"
+      >
+        <form onSubmit={handleCreatePortfolio} className="space-y-4">
+          <Input
+            label="ชื่อผลงาน / กิจกรรม *"
+            placeholder="เช่น ระบบจัดการห้องสมุดด้วย Next.js หรือ โครงการจิตอาสา"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Select
+              label="ประเภทผลงาน"
+              value={category}
+              onChange={(val) => setCategory(val as ActivityCategory)}
+              options={Object.entries(ACTIVITY_CATEGORIES).map(([k, v]) => ({ value: k, label: v.label }))}
+            />
+            <Select
+              label="ทักษะหลักที่เกี่ยวข้อง"
+              value={skillId}
+              onChange={(val) => setSkillId(val)}
+              options={CRU_SKILLS.map((s) => ({ value: s.id, label: s.name }))}
+            />
+          </div>
+          <Input
+            label="ชื่อหลักฐาน / เอกสารอ้างอิง"
+            placeholder="เช่น เกียรติบัตร หรือ ลิงก์ GitHub / PDF รายงาน"
+            value={evidenceTitle}
+            onChange={(e) => setEvidenceTitle(e.target.value)}
+          />
+          <Textarea
+            label="รายละเอียดผลงาน"
+            placeholder="อธิบายบทบาท หน้าที่ และผลลัพธ์ของผลงานชิ้นนี้..."
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <Textarea
+            label="สิ่งที่ได้เรียนรู้ (Reflection)"
+            placeholder="ทักษะหรือประสบการณ์สำคัญที่ได้รับ..."
+            rows={2}
+            value={reflection}
+            onChange={(e) => setReflection(e.target.value)}
+          />
+          <FileUpload
+            label="แนบไฟล์หลักฐาน (ถ้ามี)"
+            selectedFile={selectedFile}
+            onFileSelect={setSelectedFile}
+          />
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+              ยกเลิก
+            </Button>
+            <Button type="submit" variant="accent">
+              <Plus className="h-4 w-4" /> บันทึกเข้า Portfolio
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Mobile FAB */}
+      <FAB
+        onClick={() => setIsCreateOpen(true)}
+        icon={<Plus className="h-6 w-6" />}
+        label="สร้าง Portfolio"
+      />
     </div>
   );
 }

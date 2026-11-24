@@ -36,7 +36,7 @@ export function Navbar({ onOpenMobileDrawer }: NavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-border bg-card/95 backdrop-blur-md">
+    <header className="sticky top-0 z-30 h-16 border-b border-border bg-card/95 backdrop-blur-md print:hidden">
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
         {/* Left: Mobile Hamburger + Brand */}
         <div className="flex items-center gap-3">

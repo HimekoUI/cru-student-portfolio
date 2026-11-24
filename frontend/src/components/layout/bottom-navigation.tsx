@@ -25,7 +25,7 @@ export function BottomNavigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 lg:hidden border-t border-border bg-card/95 backdrop-blur-md">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 lg:hidden border-t border-border bg-card/95 backdrop-blur-md print:hidden">
       <div className="flex items-center justify-around h-16 px-1">
         {items.slice(0, 5).map((item) => {
           const Icon = item.icon;

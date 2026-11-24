@@ -64,6 +64,17 @@ interface AppStoreContextType {
     feedback?: string;
   }) => void;
 
+  addPortfolioItem: (input: {
+    studentId: string;
+    title: string;
+    category: ActivityCategory;
+    evidenceTitle: string;
+    description: string;
+    reflection: string;
+    skillId: string;
+    fileName?: string;
+  }) => void;
+
   togglePortfolioPublic: (portfolioItemId: string) => void;
   resetAllData: () => void;
 }
@@ -287,6 +298,69 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  const addPortfolioItem: AppStoreContextType["addPortfolioItem"] = (input) => {
+    persist((prev) => {
+      const now = Date.now();
+      const matchedSkill = CRU_SKILLS.find((s) => s.id === input.skillId) || CRU_SKILLS[0];
+
+      const newActivity: Activity = {
+        id: `act-pf-${now}`,
+        title: input.title,
+        description: input.description,
+        category: input.category,
+        startDate: new Date().toISOString(),
+        endDate: new Date().toISOString(),
+        location: "แฟ้มสะสมผลงานนักศึกษา",
+        maxParticipants: 1,
+        currentParticipants: 1,
+        status: "completed",
+        skills: [matchedSkill],
+        organizerId: input.studentId,
+        createdAt: new Date().toISOString(),
+      };
+
+      const newEnrollment: Enrollment = {
+        id: `enr-pf-${now}`,
+        activityId: newActivity.id,
+        studentId: input.studentId,
+        status: "attended",
+        enrolledAt: new Date().toISOString(),
+        attendedAt: new Date().toISOString(),
+      };
+
+      const newEvidence: Evidence = {
+        id: `ev-pf-${now}`,
+        enrollmentId: newEnrollment.id,
+        type: "file",
+        title: input.evidenceTitle || input.title,
+        description: input.description,
+        reflection: input.reflection,
+        fileUrl: input.fileName ? `/uploads/${input.fileName}` : undefined,
+        submittedAt: new Date().toISOString(),
+      };
+
+      const newPortfolioItem: PortfolioItem = {
+        id: `pf-${now}`,
+        studentId: input.studentId,
+        activityId: newActivity.id,
+        activity: newActivity,
+        evidenceId: newEvidence.id,
+        evidence: newEvidence,
+        assessments: [],
+        isPublic: true,
+        displayOrder: prev.portfolioItems.length + 1,
+      };
+
+      return {
+        ...prev,
+        activities: [newActivity, ...prev.activities],
+        enrollments: [newEnrollment, ...prev.enrollments],
+        evidences: [newEvidence, ...prev.evidences],
+        portfolioItems: [newPortfolioItem, ...prev.portfolioItems],
+      };
+    });
+  };
+
   const resetAllData = () => {
     setState(EMPTY_STATE);
     localStorage.removeItem(STORE_KEY);
@@ -321,6 +395,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
         cancelEnrollment,
         submitEvidence,
         verifyAndAssess,
+        addPortfolioItem,
         togglePortfolioPublic,
         resetAllData,
       }}
