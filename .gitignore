@@ -1,0 +1,18 @@
+# Dependencies & Build
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Environment variables
+.env
+.env*.local
+
+# Reference skills (cloned locally)
+.skills/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.log
